@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-'''
+"""
 pysticks.py: Python classes for flying with joysticks, R/C controllers
 
 Requires: pygame
@@ -19,63 +19,89 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License 
 along with this PySticks.  If not, see <http:#www.gnu.org/licenses/>.
-'''
+"""
 
 import pygame
 import time
 
-class Controller(object):
 
-    STICK_DEADBAND = .05
+class Controller(object):
+    STICK_DEADBAND = 0.05
 
     def __init__(self, axis_map):
-
         self.joystick = None
         self.axis_map = axis_map
-        
-    def update(self):
 
+    def update(self):
         pygame.event.pump()
 
     def getThrottle(self):
-
         return self._getAxis(0)
 
     def getRoll(self):
-
         return self._getAxis(1)
 
     def getPitch(self):
-
         return self._getAxis(2)
 
     def getYaw(self):
-
         return self._getAxis(3)
 
     def _getAxis(self, k):
-
         j = self.axis_map[k]
         val = self.joystick.get_axis(abs(j))
         if abs(val) < Controller.STICK_DEADBAND:
             val = 0
-        return (-1 if j<0 else +1) * val
+        return (-1 if j < 0 else +1) * val
+
 
 class _GameController(Controller):
-
     def __init__(self, axis_map, button_id):
-
         Controller.__init__(self, axis_map)
         self.button_id = button_id
         self.button_is_down = False
         self.switch_value = -1
 
     def _getAuxValue(self):
-
         return self.joystick.get_button(self.button_id)
-        
-    def getAux(self):
 
+    def get_button_0(self):
+        return self.joystick.get_button(0)
+
+    def get_button_1(self):
+        return self.joystick.get_button(1)
+
+    def get_button_2(self):
+        return self.joystick.get_button(2)
+
+    def get_button_3(self):
+        return self.joystick.get_button(3)
+
+    def get_button_4(self):
+        return self.joystick.get_button(4)
+
+    def get_button_5(self):
+        return self.joystick.get_button(5)
+
+    def get_button_6(self):
+        return self.joystick.get_button(6)
+
+    def get_button_7(self):
+        return self.joystick.get_button(7)
+
+    def get_button_8(self):
+        return self.joystick.get_button(8)
+
+    def get_button_9(self):
+        return self.joystick.get_button(9)
+
+    def get_button_10(self):
+        return self.joystick.get_button(10)
+
+    def get_button_11(self):
+        return self.joystick.get_button(11)
+
+    def getAux(self):
         if self._getAuxValue():
             if not self.button_is_down:
                 self.switch_value = -self.switch_value
@@ -84,22 +110,20 @@ class _GameController(Controller):
             self.button_is_down = False
         return self.switch_value
 
+
 class _SpringyThrottleController(_GameController):
-
     def __init__(self, axis_map, button_id):
-
         _GameController.__init__(self, axis_map, button_id)
-        
+
         self.throttleval = -1
 
         self.prevtime = 0
 
     def getThrottle(self):
-
         currtime = time.time()
 
         # Scale throttle increment by time difference from last update
-        self.throttleval += self._getAxis(0) * (currtime-self.prevtime)
+        self.throttleval += self._getAxis(0) * (currtime - self.prevtime)
 
         # Constrain throttle to [-1,+1]
         self.throttleval = min(max(self.throttleval, -1), +1)
@@ -108,55 +132,51 @@ class _SpringyThrottleController(_GameController):
 
         return self.throttleval
 
+
 class _RcTransmitter(Controller):
-
     def __init__(self, axis_map, aux_id):
-
         Controller.__init__(self, axis_map)
         self.aux_id = aux_id
-        
+
     def getAux(self):
-
         return +1 if self.joystick.get_axis(self.aux_id) > 0 else -1
-        
+
+
 class _Xbox360(_SpringyThrottleController):
-
     def __init__(self, axes, aux):
-
         _SpringyThrottleController.__init__(self, axes, None)
 
         self.aux = aux
 
     def _getAuxValue(self):
+        return self.joystick.get_axis(self.aux) < -0.5
 
-        return self.joystick.get_axis(self.aux) < -.5
 
 class _Playstation(_SpringyThrottleController):
-
     def __init__(self, axes):
-
         _SpringyThrottleController.__init__(self, axes, 7)
-        
+
 
 # Different OSs have different names for the same controller, so we don't
 # need to check OS when setting up the axes.
 controllers = {
-    'Controller (Rock Candy Gamepad for Xbox 360)'       : _Xbox360((-1,4,-3,0), 2), 
-    'Rock Candy Gamepad for Xbox 360'                    : _Xbox360((-1,3,-4,0), 5), 
-    '2In1 USB Joystick'                                  : _Playstation((-1,2,-3,0)),
-    'Wireless Controller'                                : _Playstation((-1,2,-3,0)),
-    'MY-POWER CO.,LTD. 2In1 USB Joystick'                : _Playstation((-1,2,-3,0)),
-    'Sony Interactive Entertainment Wireless Controller' : _Playstation((-1,3,-4,0)),
-    'Logitech Extreme 3D'                                : _GameController((-2,0,-1,3), 0),
-    'Logitech Logitech Extreme 3D'                       : _GameController((-3,0,-1,2), 0),
-    'FrSky Taranis Joystick'                             : _RcTransmitter((0,1,2,5), 3),
-    'FrSky FrSky Taranis Joystick'                       : _RcTransmitter((0,1,2,3), 5),
-    'SPEKTRUM RECEIVER'                                  : _RcTransmitter((1,2,5,0), 4),
-    'Horizon Hobby SPEKTRUM RECEIVER'                    : _RcTransmitter((1,2,3,0), 4)
-    }
+    "Controller (Rock Candy Gamepad for Xbox 360)": _Xbox360((-1, 4, -3, 0), 2),
+    "Rock Candy Gamepad for Xbox 360": _Xbox360((-1, 3, -4, 0), 5),
+    "2In1 USB Joystick": _Playstation((-1, 2, -3, 0)),
+    "Wireless Controller": _Playstation((-1, 2, -3, 0)),
+    "MY-POWER CO.,LTD. 2In1 USB Joystick": _Playstation((-1, 2, -3, 0)),
+    "Sony Interactive Entertainment Wireless Controller": _Playstation((-1, 3, -4, 0)),
+    "Logitech Extreme 3D": _GameController((-2, 0, -1, 3), 0),
+    "Logitech Logitech Extreme 3D": _GameController((-3, 0, -1, 2), 0),
+    "Logitech Extreme 3D pro": _GameController((-3, 0, -1, 2), 0),
+    "FrSky Taranis Joystick": _RcTransmitter((0, 1, 2, 5), 3),
+    "FrSky FrSky Taranis Joystick": _RcTransmitter((0, 1, 2, 3), 5),
+    "SPEKTRUM RECEIVER": _RcTransmitter((1, 2, 5, 0), 4),
+    "Horizon Hobby SPEKTRUM RECEIVER": _RcTransmitter((1, 2, 3, 0), 4),
+}
+
 
 def get_controller():
-
     # Initialize pygame for joystick support
     pygame.display.init()
     pygame.joystick.init()
@@ -166,7 +186,7 @@ def get_controller():
     # Find your controller
     controller_name = joystick.get_name()
     if not controller_name in controllers.keys():
-        print('Unrecognized controller: %s' % controller_name)
+        print("Unrecognized controller: %s" % controller_name)
         exit(1)
     controller = controllers[controller_name]
     controller.joystick = joystick
