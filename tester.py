@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-'''
+"""
 tester.py: Test program for PySticks
 
 Requires: pygame
@@ -19,21 +19,29 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License 
 along with this code.  If not, see <http:#www.gnu.org/licenses/>.
-'''
+"""
 
 from pysticks import get_controller
 
 con = get_controller()
-    
+
 while True:
-
     try:
-
         con.update()
 
-        print('Throttle: %+2.2f   Roll: %+2.2f   Pitch: %+2.2f   Yaw: %+2.2f   Aux: %+2.2f' %
-             (con.getThrottle(), con.getRoll(), con.getPitch(), con.getYaw(), con.getAux()))
+        print(
+            "Throttle: %+2.2f   Roll: %+2.2f   Pitch: %+2.2f   Yaw: %+2.2f   Aux: %+2.2f  Trackball_x: %+2.2f Trackball_y: %+2.2f"
+            % (
+                con.getThrottle(),
+                con.getRoll() if not con.getAimball()[1] else 0,
+                con.getPitch() if not con.getAimball()[0] else 0,
+                con.getYaw() if not (con.getAimball()[0] or con.getAimball()[1]) else 0,
+                con.getAux(),
+                con.getAimball()[0],
+                con.getAimball()[1]
+                
+            )
+        )
 
     except KeyboardInterrupt:
-
         break

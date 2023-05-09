@@ -58,50 +58,16 @@ class Controller(object):
 class _GameController(Controller):
     def __init__(self, axis_map, button_id):
         Controller.__init__(self, axis_map)
+        
         self.button_id = button_id
         self.button_is_down = False
         self.switch_value = -1
+        self.depth = -1.00
 
     def _getAuxValue(self):
         return self.joystick.get_button(self.button_id)
 
-    def get_button_0(self):
-        return self.joystick.get_button(0)
-
-    def get_button_1(self):
-        return self.joystick.get_button(1)
-
-    def get_button_2(self):
-        return self.joystick.get_button(2)
-
-    def get_button_3(self):
-        return self.joystick.get_button(3)
-
-    def get_button_4(self):
-        return self.joystick.get_button(4)
-
-    def get_button_5(self):
-        return self.joystick.get_button(5)
-
-    def get_button_6(self):
-        return self.joystick.get_button(6)
-
-    def get_button_7(self):
-        return self.joystick.get_button(7)
-
-    def get_button_8(self):
-        return self.joystick.get_button(8)
-
-    def get_button_9(self):
-        return self.joystick.get_button(9)
-
-    def get_button_10(self):
-        return self.joystick.get_button(10)
-
-    def get_button_11(self):
-        return self.joystick.get_button(11)
-
-    def getAux(self):
+    def getTrigger(self):
         if self._getAuxValue():
             if not self.button_is_down:
                 self.switch_value = -self.switch_value
@@ -110,7 +76,36 @@ class _GameController(Controller):
             self.button_is_down = False
         return self.switch_value
 
+    def getAimball(self):
+        """Reads the value of the small ball (hat) on the top
 
+        Returns:
+            x and y state (tuple): the active directions of x and y (-1 or 1) 
+        """
+        return self.joystick.get_hat(0)
+    
+    def depthUpFine(self):
+        # Don't rise up if the maximum value reached
+        if self.joystick.get_button(4) and self.depth > -1.0:
+            self.depth -= 0.01
+    
+    def depthUpCoarse(self):
+        # Don't rise up if the maximum value reached
+        if self.joystick.get_button(5) and self.depth > -1.0:
+            self.depth -= 0.1
+    
+    def depthDownFine(self):
+        # Don't rise up if the maximum value reached
+        if self.joystick.get_button(6) and self.depth < 1.0:
+            self.depth += 0.01
+    
+    def depthDownCoarse(self):
+        # Don't rise up if the maximum value reached
+        if self.joystick.get_button(3) and self.depth < 1.0:
+            self.depth += 0.1
+    
+    
+        
 class _SpringyThrottleController(_GameController):
     def __init__(self, axis_map, button_id):
         _GameController.__init__(self, axis_map, button_id)
