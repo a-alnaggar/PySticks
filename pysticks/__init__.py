@@ -62,7 +62,7 @@ class _GameController(Controller):
         self.button_id = button_id
         self.button_is_down = False
         self.switch_value = -1
-        self.depth = -1.00
+        self.depth = 0
 
     def _getAuxValue(self):
         return self.joystick.get_button(self.button_id)
@@ -87,23 +87,38 @@ class _GameController(Controller):
     def depthUpFine(self):
         # Don't rise up if the maximum value reached
         if self.joystick.get_button(4) and self.depth > -1.0:
-            self.depth -= 0.01
+            if self.depth > 0:
+                self.depth = 0
+            else:
+                self.depth -= 0.01
     
     def depthUpCoarse(self):
         # Don't rise up if the maximum value reached
         if self.joystick.get_button(5) and self.depth > -1.0:
-            self.depth -= 0.1
+            if self.depth > 0:
+                self.depth = 0
+            else:
+                self.depth -= 0.1
     
     def depthDownFine(self):
         # Don't rise up if the maximum value reached
-        if self.joystick.get_button(6) and self.depth < 1.0:
-            self.depth += 0.01
+        if self.joystick.get_button(2) and self.depth < 1.0:
+            if self.depth < 0:
+                self.depth = 0
+            else:
+                self.depth += 0.01
     
     def depthDownCoarse(self):
         # Don't rise up if the maximum value reached
         if self.joystick.get_button(3) and self.depth < 1.0:
-            self.depth += 0.1
+            if self.depth < 0:
+                self.depth = 0
+            else:
+                self.depth += 0.1
     
+    def stopAll(self):
+        # Breaks button
+        return bool(self.joystick.get_button(1))
     
         
 class _SpringyThrottleController(_GameController):
